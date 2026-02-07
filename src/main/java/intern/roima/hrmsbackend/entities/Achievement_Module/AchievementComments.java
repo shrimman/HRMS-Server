@@ -27,20 +27,20 @@ public class AchievementComments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long CommentId;
+    private Long commentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PostId", referencedColumnName = "PostId", nullable = false)
+    @JoinColumn(name = "PostId", referencedColumnName = "postId", nullable = false)
     private AchievementPosts post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "AuthorId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "AuthorId", referencedColumnName = "employeeId", nullable = false)
     private Employees author;
 
     @Column(name = "Text", nullable = false, columnDefinition = "TEXT")
     private String text;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime CreatedAt;
+    private LocalDateTime createdAt;
 
 }

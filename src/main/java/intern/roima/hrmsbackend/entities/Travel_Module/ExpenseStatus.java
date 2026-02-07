@@ -20,8 +20,8 @@ import lombok.Setter;
 public class ExpenseStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long StatusId;
+    private Long statusId;
 
     @Column(nullable = false)
-    private String StatusName;
+    private String statusName;
 }

@@ -26,12 +26,12 @@ public class Travels {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelId", referencedColumnName = "TravelId", nullable = false)
+    @JoinColumn(name = "TravelId", referencedColumnName = "travelId", nullable = false)
     private TravelPlans travelPlan;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
 }

@@ -7,6 +7,6 @@ import intern.roima.hrmsbackend.entities.Employee_Module.Roles;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Roles, Integer> {
-    boolean findByRoleName(String RoleName);
+    boolean existsByRoleName(String roleName);
 
 }

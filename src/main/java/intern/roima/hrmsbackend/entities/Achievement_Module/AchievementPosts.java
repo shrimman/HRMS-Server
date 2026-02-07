@@ -27,22 +27,22 @@ public class AchievementPosts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long PostId;
+    private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "AuthorId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "AuthorId", referencedColumnName = "employeeId", nullable = false)
     private Employees author;
 
     @Column(nullable = false, length = 255)
-    private String Title;
+    private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String Description;
+    private String description;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime CreatedAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private Boolean IsSystemGenerated;
+    private Boolean isSystemGenerated;
 
 }

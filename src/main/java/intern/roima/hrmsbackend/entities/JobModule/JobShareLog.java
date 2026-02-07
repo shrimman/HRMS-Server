@@ -27,20 +27,20 @@ public class JobShareLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ShareId;
+    private Long shareId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "JobId", referencedColumnName = "JobId", nullable = false)
+    @JoinColumn(name = "JobId", referencedColumnName = "jobId", nullable = false)
     private JobOpenings jobOpening;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SharedById", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "SharedById", referencedColumnName = "employeeId", nullable = false)
     private Employees sharedBy;
 
     @Column(nullable = false, length = 255)
-    private String RecipientEmail;
+    private String recipientEmail;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime SharedAt;
+    private LocalDateTime sharedAt;
 
 }

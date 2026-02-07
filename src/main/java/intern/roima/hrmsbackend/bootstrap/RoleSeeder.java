@@ -10,30 +10,30 @@ import intern.roima.hrmsbackend.repositories.Employee_Module.RoleRepository;
 
 @Component
 public class RoleSeeder implements ApplicationListener<ContextRefreshedEvent> {
-    private final RoleRepository RoleRepository;
+   private final RoleRepository RoleRepository;
 
-    public RoleSeeder(RoleRepository RoleRepository) {
-        this.RoleRepository = RoleRepository;
-    }
+   public RoleSeeder(RoleRepository RoleRepository) {
+       this.RoleRepository = RoleRepository;
+   }
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        this.loadRoles();
-    }
+   @Override
+   public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+       this.loadRoles();
+   }
 
-    private void loadRoles() {
-        RoleEnum[] roleNames = new RoleEnum[]{
-                RoleEnum.EMPLOYEE,
-                RoleEnum.HR,
-                RoleEnum.MANAGER
-        };
+   private void loadRoles() {
+       RoleEnum[] roleNames = new RoleEnum[]{
+               RoleEnum.EMPLOYEE,
+               RoleEnum.HR,
+               RoleEnum.MANAGER
+       };
 
-        for (RoleEnum RoleName : roleNames) {
-            if (!RoleRepository.findByRoleName(RoleName.name())) {
-                Roles role = new Roles();
-                RoleRepository.save(role);
-                role.setRoleName(RoleName.name());
-            }
-        }
-    }
+       for (RoleEnum RoleName : roleNames) {
+           if (!RoleRepository.existsByRoleName(RoleName.name())) {
+               Roles role = new Roles();
+               role.setRoleName(RoleName.name());
+               RoleRepository.save(role);
+           }
+       }
+   }
 }

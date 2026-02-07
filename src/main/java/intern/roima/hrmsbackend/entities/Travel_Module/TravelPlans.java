@@ -27,22 +27,22 @@ public class TravelPlans {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long TravelId;
+    private Long travelId;
 
     @Column(nullable = false, length = 255)
-    private String Title;
+    private String title;
 
     @Column(length = 255)
-    private String Description;
+    private String description;
 
     @Column(nullable = false)
-    private java.time.LocalDate StartDate;
+    private java.time.LocalDate startDate;
 
     @Column(nullable = false)
-    private java.time.LocalDate EndDate;
+    private java.time.LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CreatedByHRId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "CreatedByHRId", referencedColumnName = "employeeId", nullable = false)
     private Employees createdByHR;
 
     @Column(nullable = false, updatable = false)

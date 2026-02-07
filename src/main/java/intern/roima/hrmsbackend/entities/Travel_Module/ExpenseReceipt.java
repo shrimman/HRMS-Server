@@ -23,15 +23,15 @@ public class ExpenseReceipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ExpenseReceiptId;
+    private Long expenseReceiptId;
 
     @Column(nullable = false, length = 255)
-    private String FileName;
+    private String fileName;
 
     @Column(nullable = false, length = 255)
-    private String ReceiptPath;
+    private String receiptPath;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime UploadedAt;
+    private LocalDateTime uploadedAt;
 
 }

@@ -35,48 +35,48 @@ import lombok.Setter;
 public class Employees implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long EmployeeId;
+    private Long employeeId;
 
     @Column(nullable = false, length = 100)
-    private String FirstName;
+    private String firstName;
 
     @Column(nullable = false, length = 100)
-    private String LastName;
+    private String lastName;
 
     @Email
     @Column(unique = true, length = 255, nullable = false)
-    private String Email;
+    private String email;
 
     @Column(unique = true, length = 255, nullable = false)
-    private String PasswordHash;
+    private String passwordHash;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RoleId", referencedColumnName = "RoleId", nullable = false)
+    @JoinColumn(name = "RoleId", referencedColumnName = "roleId", nullable = false)
     private Roles role;
 
     @OneToOne()
-    @JoinColumn(name = "ManagerId", referencedColumnName = "EmployeeId", nullable = true)
+    @JoinColumn(name = "ManagerId", referencedColumnName = "employeeId", nullable = true)
     private Employees manager;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DepartmentId", referencedColumnName = "DepartmentId", nullable = true)
+    @JoinColumn(name = "DepartmentId", referencedColumnName = "departmentId", nullable = true)
     private Departments department;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DesignationId", referencedColumnName = "DesignationId", nullable = true)
+    @JoinColumn(name = "DesignationId", referencedColumnName = "designationId", nullable = true)
     private Designations designation;
 
     @Column(nullable = false)
-    private LocalDate DateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(nullable = false)
-    private LocalDate DateOfJoining;
+    private LocalDate dateOfJoining;
 
     @Column(nullable = false)
-    private String PhotoPath = "https://pngtree.com/freepng/male-company-employee-avatar-icon-wearing-a-necktie_8537621.html";
+    private String photoPath = "https://pngtree.com/freepng/male-company-employee-avatar-icon-wearing-a-necktie_8537621.html";
 
     @Column(nullable = false)
-    private boolean IsActive = true;
+    private boolean isActive = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -87,12 +87,12 @@ public class Employees implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return this.PasswordHash;
+        return this.passwordHash;
     }
 
     @Override
     public String getUsername() {
-        return this.Email;
+        return this.email;
     }
 
 }

@@ -27,30 +27,30 @@ public class TravelDocuments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long DocumentId;
+    private Long documentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelId", referencedColumnName = "TravelId", nullable = false)
+    @JoinColumn(name = "TravelId", referencedColumnName = "travelId", nullable = false)
     private TravelPlans travelPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
     @Column(nullable = false, length = 100)
-    private String DocumentType;
+    private String documentType;
 
     @Column(nullable = false, length = 255)
-    private String DocumentName;
+    private String documentName;
 
     @Column(nullable = false, length = 255)
-    private String DocumentPath;
+    private String documentPath;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime UploadedAt;
+    private LocalDateTime uploadedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UploadedById", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "UploadedById", referencedColumnName = "employeeId", nullable = false)
     private Employees uploadedBy;
 
 }

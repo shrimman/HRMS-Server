@@ -22,20 +22,20 @@ import lombok.Setter;
 public class EmailTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long TemplateId;
+    private Long templateId;
 
     @Column(nullable = false, unique = true, length = 100)
-    private String TemplateName;
+    private String templateName;
 
     @Column(nullable = false, length = 255)
-    private String Subject;
+    private String subject;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String Body;
+    private String body;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime CreatedAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = true)
-    private LocalDateTime UpdatedAt;
+    private LocalDateTime updatedAt;
 }

@@ -21,12 +21,12 @@ import lombok.Setter;
 public class Departments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long DepartmentId;
+    private Long departmentId;
 
     @Column(nullable = false)
-    private String DepartmentName;
+    private String departmentName;
 
     @Column(nullable = true)
-    private String Description;
+    private String description;
 
 }

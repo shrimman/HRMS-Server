@@ -26,18 +26,18 @@ import lombok.Setter;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long NotificationId;
+    private Long notificationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
     @Column(nullable = false, length = 500)
-    private String Message;
+    private String message;
 
     @Column(nullable = false)
-    private Boolean IsRead = false;
+    private Boolean isRead = false;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime CreatedAt;
+    private LocalDateTime createdAt;
 }

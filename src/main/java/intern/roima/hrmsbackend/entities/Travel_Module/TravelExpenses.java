@@ -29,44 +29,44 @@ public class TravelExpenses {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ExpenseId;
+    private Long expenseId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelId", referencedColumnName = "TravelId", nullable = false)
+    @JoinColumn(name = "TravelId", referencedColumnName = "travelId", nullable = false)
     private TravelPlans travelPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ExpenseReceiptId", referencedColumnName = "ExpenseReceiptId", nullable = true)
+    @JoinColumn(name = "ExpenseReceiptId", referencedColumnName = "expenseReceiptId", nullable = true)
     private ExpenseReceipt expenseReceipt;
 
     @Column(nullable = false, length = 100)
-    private String ExpenseType;
+    private String expenseType;
 
     @Column(nullable = false)
-    private BigDecimal Amount;
+    private BigDecimal amount;
 
     @Column(nullable = false)
-    private LocalDate ExpenseDate;
+    private LocalDate expenseDate;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime SubmittedAt;
+    private LocalDateTime submittedAt;
 
     @Column(nullable = true)
-    private LocalDateTime UpdatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(nullable = true, length = 255)
-    private String HR_Remarks;
+    private String hrRemarks;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ApprovalStatus", referencedColumnName = "StatusId", nullable = false)
+    @JoinColumn(name = "ApprovalStatus", referencedColumnName = "statusId", nullable = false)
     private ExpenseStatus approvalStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "HR_ActionById", referencedColumnName = "EmployeeId", nullable = true)
+    @JoinColumn(name = "HR_ActionById", referencedColumnName = "employeeId", nullable = true)
     private Employees hrActionBy;
 
 }

@@ -24,21 +24,21 @@ public class JobOpenings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long JobId;
+    private Long jobId;
 
     @Column(nullable = false, length = 255)
-    private String Title;
+    private String title;
 
     @Column(columnDefinition = "TEXT", nullable = true)
-    private String Summary;
+    private String summary;
 
     @Column(nullable = true, length = 255)
-    private String JDFilePath;
+    private String jdFilePath;
 
     @Column(nullable = false)
-    private Boolean IsActive;
+    private Boolean isActive;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime PostedAt;
+    private LocalDateTime postedAt;
 
 }

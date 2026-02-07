@@ -26,12 +26,12 @@ public class AchievementLikes {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PostId", referencedColumnName = "PostId", nullable = false)
+    @JoinColumn(name = "PostId", referencedColumnName = "postId", nullable = false)
     private AchievementPosts post;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
 }

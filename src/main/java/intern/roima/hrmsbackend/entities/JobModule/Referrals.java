@@ -28,34 +28,34 @@ public class Referrals {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ReferralId;
+    private Long referralId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "JobId", referencedColumnName = "JobId", nullable = false)
+    @JoinColumn(name = "JobId", referencedColumnName = "jobId", nullable = false)
     private JobOpenings jobOpening;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ReferrerId", referencedColumnName = "EmployeeId", nullable = false)
+    @JoinColumn(name = "ReferrerId", referencedColumnName = "employeeId", nullable = false)
     private Employees referrer;
 
     @Column(nullable = false, length = 255)
-    private String FriendName;
+    private String friendName;
 
     @Email
     @Column(nullable = false, length = 255)
-    private String FriendEmail;
+    private String friendEmail;
 
     @Column(nullable = true, length = 255)
-    private String CVFilePath;
+    private String cvFilePath;
 
     @Column(columnDefinition = "TEXT", nullable = true)
-    private String Note;
+    private String note;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ReferralStatus", referencedColumnName = "StatusId", nullable = false)
+    @JoinColumn(name = "ReferralStatus", referencedColumnName = "statusId", nullable = false)
     private ReferralStatus referralStatus;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime CreatedAt;
+    private LocalDateTime createdAt;
 
 }

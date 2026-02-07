@@ -21,8 +21,8 @@ public class ReferralStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long StatusId;
+    private Long statusId;
 
     @Column(nullable = false, length = 100)
-    private String StatusName;
+    private String statusName;
 }
