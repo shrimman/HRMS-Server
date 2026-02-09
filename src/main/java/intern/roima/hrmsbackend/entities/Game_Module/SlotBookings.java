@@ -1,4 +1,4 @@
-package intern.roima.hrmsbackend.entities.JobModule;
+package intern.roima.hrmsbackend.entities.Game_Module;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,39 +22,33 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Referral")
-public class Referrals {
+@Table(name = "SlotBookings")
+public class SlotBookings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long referralId;
+    private Long bookingId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "JobId", referencedColumnName = "jobId", nullable = false)
-    private JobOpenings jobOpening;
+    @JoinColumn(name = "SlotId", referencedColumnName = "slotId", nullable = false)
+    private GameSlots slot;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ReferrerId", referencedColumnName = "employeeId", nullable = false)
-    private Employees referrer;
-
-    @Column(nullable = false, length = 255)
-    private String friendName;
-
-    @Email
-    @Column(nullable = false, length = 255)
-    private String friendEmail;
-
-    @Column(nullable = true, length = 255)
-    private String cvFilePath;
-
-    @Column(columnDefinition = "TEXT", nullable = true)
-    private String note;
+    @JoinColumn(name = "BookedByEmployeeId", referencedColumnName = "employeeId", nullable = false)
+    private Employees bookedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ReferralStatus", referencedColumnName = "statusId", nullable = false)
-    private ReferralStatus referralStatus;
+    @JoinColumn(name = "BookingStatusId", referencedColumnName = "bookingStatusId", nullable = false)
+    private BookingStatus bookingStatus;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UpdatedBy", referencedColumnName = "employeeId")
+    private Employees updatedByEmployee;
 
 }

@@ -37,8 +37,9 @@ public class TravelDocuments {
     @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
-    @Column(nullable = false, length = 100)
-    private String documentType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DocumentTypeId", referencedColumnName = "documentTypeId", nullable = false)
+    private DocumentType documentType;
 
     @Column(nullable = false, length = 255)
     private String documentName;

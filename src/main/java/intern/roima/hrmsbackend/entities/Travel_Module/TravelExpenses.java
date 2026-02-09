@@ -36,15 +36,8 @@ public class TravelExpenses {
     private TravelPlans travelPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ExpenseReceiptId", referencedColumnName = "expenseReceiptId", nullable = true)
-    private ExpenseReceipt expenseReceipt;
-
-    @Column(nullable = false, length = 100)
-    private String expenseType;
+    @JoinColumn(name = "ExpenseTypeId", referencedColumnName = "expenseTypeId", nullable = false)
+    private ExpenseType expenseType;
 
     @Column(nullable = false)
     private BigDecimal amount;
@@ -55,7 +48,7 @@ public class TravelExpenses {
     @Column(nullable = false, updatable = false)
     private LocalDateTime submittedAt;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @Column(nullable = true, length = 255)
@@ -68,5 +61,9 @@ public class TravelExpenses {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "HR_ActionById", referencedColumnName = "employeeId", nullable = true)
     private Employees hrActionBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UpdatedBy", referencedColumnName = "employeeId")
+    private Employees updatedByEmployee;
 
 }

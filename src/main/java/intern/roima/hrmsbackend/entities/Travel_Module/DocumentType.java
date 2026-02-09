@@ -22,20 +22,21 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Travels")
-public class Travels {
+@Table(name = "DocumentTypes")
+public class DocumentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long travelId;
+    private Long documentTypeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelPlanId", referencedColumnName = "travelId", nullable = false)
-    private TravelPlans travelPlan;
+    @Column(nullable = false, length = 100)
+    private String typeName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false)
+    private boolean isActive = true;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

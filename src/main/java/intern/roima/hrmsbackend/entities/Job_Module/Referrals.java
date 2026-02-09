@@ -1,4 +1,4 @@
-package intern.roima.hrmsbackend.entities.Achievement_Module;
+package intern.roima.hrmsbackend.entities.Job_Module;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,20 +23,37 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "AchievementLikes")
-public class AchievementLikes {
+@Table(name = "Referrals")
+public class Referrals {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long referralId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PostId", referencedColumnName = "postId", nullable = false)
-    private AchievementPosts post;
+    @JoinColumn(name = "JobId", referencedColumnName = "jobId", nullable = false)
+    private JobOpenings jobOpening;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
+    @JoinColumn(name = "ReferrerId", referencedColumnName = "employeeId", nullable = false)
+    private Employees referrer;
+
+    @Column(nullable = false, length = 255)
+    private String friendName;
+
+    @Email
+    @Column(nullable = false, length = 255)
+    private String friendEmail;
+
+    @Column(nullable = true, length = 255)
+    private String cvFilePath;
+
+    @Column(columnDefinition = "TEXT", nullable = true)
+    private String note;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ReferralStatus", referencedColumnName = "statusId", nullable = false)
+    private ReferralStatus referralStatus;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

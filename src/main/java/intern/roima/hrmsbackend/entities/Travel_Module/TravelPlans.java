@@ -22,7 +22,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "TravelPlan")
+@Table(name = "TravelPlans")
 public class TravelPlans {
 
     @Id
@@ -46,6 +46,13 @@ public class TravelPlans {
     private Employees createdByHR;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime CreatedAt;
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UpdatedBy", referencedColumnName = "employeeId")
+    private Employees updatedByEmployee;
 
 }

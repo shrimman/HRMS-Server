@@ -1,4 +1,4 @@
-package intern.roima.hrmsbackend.entities.Travel_Module;
+package intern.roima.hrmsbackend.entities.Job_Module;
 
 import java.time.LocalDateTime;
 
@@ -22,29 +22,25 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Travels")
-public class Travels {
+@Table(name = "JobShareLog")
+public class JobShareLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long travelId;
+    private Long shareId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelPlanId", referencedColumnName = "travelId", nullable = false)
-    private TravelPlans travelPlan;
+    @JoinColumn(name = "JobId", referencedColumnName = "jobId", nullable = false)
+    private JobOpenings jobOpening;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
+    @JoinColumn(name = "SharedById", referencedColumnName = "employeeId", nullable = false)
+    private Employees sharedBy;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false, length = 255)
+    private String recipientEmail;
 
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UpdatedBy", referencedColumnName = "employeeId")
-    private Employees updatedByEmployee;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime sharedAt;
 
 }

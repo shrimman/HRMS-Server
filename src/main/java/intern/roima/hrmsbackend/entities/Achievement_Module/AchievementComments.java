@@ -22,7 +22,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "PostComment")
+@Table(name = "AchievementComments")
 public class AchievementComments {
 
     @Id
@@ -37,10 +37,17 @@ public class AchievementComments {
     @JoinColumn(name = "AuthorId", referencedColumnName = "employeeId", nullable = false)
     private Employees author;
 
-    @Column(name = "Text", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UpdatedById", referencedColumnName = "employeeId")
+    private Employees updatedByEmployee;
 
 }

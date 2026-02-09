@@ -1,4 +1,4 @@
-package intern.roima.hrmsbackend.entities.Travel_Module;
+package intern.roima.hrmsbackend.entities.Game_Module;
 
 import java.time.LocalDateTime;
 
@@ -11,31 +11,43 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.persistence.Table;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Travels")
-public class Travels {
+@Table(name = "GameSlots")
+public class GameSlots {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long travelId;
+    private Long slotId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelPlanId", referencedColumnName = "travelId", nullable = false)
-    private TravelPlans travelPlan;
+    @JoinColumn(name = "GameId", referencedColumnName = "gameId", nullable = false)
+    private Games game;
+
+    @Column(nullable = false)
+    private LocalDateTime slotDate;
+
+    @Column(nullable = false)
+    private LocalDateTime startDateTime;
+
+    @Column(nullable = false)
+    private LocalDateTime endDateTime;
+
+    @Column(nullable = false)
+    private Integer maxPlayers;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
+    @JoinColumn(name = "SlotStatusId", referencedColumnName = "slotStatusId", nullable = false)
+    private SlotStatus status;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -46,5 +58,4 @@ public class Travels {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UpdatedBy", referencedColumnName = "employeeId")
     private Employees updatedByEmployee;
-
 }

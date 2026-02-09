@@ -22,29 +22,33 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "AchievementLikes")
-public class AchievementLikes {
+@Table(name = "AchievementModerations")
+public class AchievementModerations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long moderationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PostId", referencedColumnName = "postId", nullable = false)
+    @JoinColumn(name = "PostId", referencedColumnName = "postId")
     private AchievementPosts post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    @JoinColumn(name = "CommentId", referencedColumnName = "commentId")
+    private AchievementComments comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UpdatedById", referencedColumnName = "employeeId")
-    private Employees updatedByEmployee;
+    @JoinColumn(name = "ModerationTypeId", referencedColumnName = "moderationTypeId", nullable = false)
+    private ModerationTypes moderationType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DeletedById", referencedColumnName = "employeeId", nullable = false)
+    private Employees deletedBy;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String reason;
+
+    @Column(nullable = false)
+    private LocalDateTime deletedAt;
 
 }

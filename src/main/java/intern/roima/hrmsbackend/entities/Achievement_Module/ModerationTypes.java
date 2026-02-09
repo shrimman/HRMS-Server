@@ -1,4 +1,4 @@
-package intern.roima.hrmsbackend.entities.Travel_Module;
+package intern.roima.hrmsbackend.entities.Achievement_Module;
 
 import java.time.LocalDateTime;
 
@@ -22,20 +22,21 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Travels")
-public class Travels {
+@Table(name = "ModerationTypes")
+public class ModerationTypes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long travelId;
+    private Long moderationTypeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelPlanId", referencedColumnName = "travelId", nullable = false)
-    private TravelPlans travelPlan;
+    @Column(nullable = false, unique = true, length = 100)
+    private String typeName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false)
+    private boolean isActive = true;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

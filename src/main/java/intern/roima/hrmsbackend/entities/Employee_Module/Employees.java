@@ -50,7 +50,7 @@ public class Employees implements UserDetails {
     @Column(unique = true, length = 255, nullable = false)
     private String passwordHash;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "RoleId", referencedColumnName = "roleId", nullable = false)
     private Roles role;
 

@@ -1,4 +1,4 @@
-package intern.roima.hrmsbackend.entities.Travel_Module;
+package intern.roima.hrmsbackend.entities.Game_Module;
 
 import java.time.LocalDateTime;
 
@@ -22,20 +22,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Travels")
-public class Travels {
-
+@Table(name = "Games")
+public class Games {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long travelId;
+    private Long gameId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelPlanId", referencedColumnName = "travelId", nullable = false)
-    private TravelPlans travelPlan;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
+    @Column(nullable = false, length = 255)
+    private String gameName;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

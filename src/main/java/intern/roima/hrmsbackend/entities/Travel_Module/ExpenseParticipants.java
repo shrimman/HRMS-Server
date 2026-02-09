@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,22 +23,28 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Travels")
-public class Travels {
+@Table(name = "ExpenseParticipants", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"ExpenseId", "ReceiptId", "EmployeeId"})
+})
+public class ExpenseParticipants {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long travelId;
+    private Long participantId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelPlanId", referencedColumnName = "travelId", nullable = false)
-    private TravelPlans travelPlan;
+    @JoinColumn(name = "ExpenseId", referencedColumnName = "expenseId", nullable = false)
+    private TravelExpenses expense;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ReceiptId", referencedColumnName = "expenseReceiptId", nullable = false)
+    private ExpenseReceipt receipt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)

@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "EmailTemplate")
+@Table(name = "EmailTemplates")
 public class EmailTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,7 @@
-package intern.roima.hrmsbackend.entities.Travel_Module;
+package intern.roima.hrmsbackend.entities.Game_Module;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import intern.roima.hrmsbackend.entities.Employee_Module.Employees;
 import jakarta.persistence.Column;
@@ -22,20 +23,28 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Travels")
-public class Travels {
+@Table(name = "GameConfigurations")
+public class GameConfigurations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long travelId;
+    private Long configId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TravelPlanId", referencedColumnName = "travelId", nullable = false)
-    private TravelPlans travelPlan;
+    @JoinColumn(name = "GameId", referencedColumnName = "gameId", nullable = false)
+    private Games game;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
-    private Employees employee;
+    @Column(nullable = false)
+    private Integer gameDuration;
+
+    @Column(nullable = false)
+    private Integer maxPlayers;
+
+    @Column(nullable = false)
+    private LocalTime startTime;
+
+    @Column(nullable = false)
+    private LocalTime endTime;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

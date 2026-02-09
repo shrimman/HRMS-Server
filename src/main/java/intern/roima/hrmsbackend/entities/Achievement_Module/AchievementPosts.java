@@ -22,7 +22,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "AchievementPost")
+@Table(name = "AchievementPosts")
 public class AchievementPosts {
 
     @Id
@@ -41,6 +41,13 @@ public class AchievementPosts {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UpdatedById", referencedColumnName = "employeeId")
+    private Employees updatedByEmployee;
 
     @Column(nullable = false)
     private Boolean isSystemGenerated;
