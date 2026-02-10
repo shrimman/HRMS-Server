@@ -95,6 +95,18 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "BAD_REQUEST", ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateEmail(DuplicateEmailException ex,
+            HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, "DUPLICATE_EMAIL", ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(InvalidEmployeeDataException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidEmployeeData(InvalidEmployeeDataException ex,
+            HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "INVALID_EMPLOYEE_DATA", ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnhandled(Exception ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "Unexpected error", request, null);
