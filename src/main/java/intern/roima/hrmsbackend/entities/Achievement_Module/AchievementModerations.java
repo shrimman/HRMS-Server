@@ -3,6 +3,7 @@ package intern.roima.hrmsbackend.entities.Achievement_Module;
 import java.time.LocalDateTime;
 
 import intern.roima.hrmsbackend.entities.Employee_Module.Employees;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,7 +30,7 @@ public class AchievementModerations {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long moderationId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "PostId", referencedColumnName = "postId")
     private AchievementPosts post;
 
