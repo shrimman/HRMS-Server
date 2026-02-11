@@ -1,5 +1,7 @@
 package intern.roima.hrmsbackend.services.Employee_Module;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
 
@@ -11,4 +13,8 @@ public interface EmployeeProfileService {
     public EmployeeSummaryDto updateEmployeeProfile(Long employeeId, EmployeeSummaryDto updatedProfile);
 
     public EmployeeSummaryDto getEmployeeProfileById(Long employeeId);
+
+    public EmployeeSummaryDto uploadProfilePhoto(Long employeeId, MultipartFile file);
+
+    public EmployeeSummaryDto deleteProfilePhoto(Long employeeId);
 }

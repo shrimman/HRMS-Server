@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.entities.Employee_Module.Departments;
@@ -18,6 +19,7 @@ import intern.roima.hrmsbackend.repositories.Employee_Module.EmployeeRepository;
 import intern.roima.hrmsbackend.repositories.Employee_Module.RoleRepository;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
 import intern.roima.hrmsbackend.services.Employee_Module.EmployeeProfileService;
+import intern.roima.hrmsbackend.services.Utils.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -29,16 +31,19 @@ public class EmployeeProfileServiceimpl implements EmployeeProfileService {
     private final RoleRepository roleRepository;
     private final DepartmentRepository departmentRepository;
     private final DesignationRepository designationRepository;
+    private final FileStorageService fileStorageService;
 
     public EmployeeProfileServiceimpl(
             EmployeeRepository employeeRepository,
             RoleRepository roleRepository,
             DepartmentRepository departmentRepository,
-            DesignationRepository designationRepository) {
+            DesignationRepository designationRepository,
+            FileStorageService fileStorageService) {
         this.employeeRepository = employeeRepository;
         this.roleRepository = roleRepository;
         this.departmentRepository = departmentRepository;
         this.designationRepository = designationRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -199,6 +204,81 @@ public class EmployeeProfileServiceimpl implements EmployeeProfileService {
         }
         if (dto.getPhotoPath() != null && !dto.getPhotoPath().isBlank()) {
             employee.setPhotoPath(dto.getPhotoPath().trim());
+        }
+    }
+
+    @Override
+    @Transactional
+    public EmployeeSummaryDto uploadProfilePhoto(Long employeeId, MultipartFile file) {
+        logger.info("Uploading profile photo for employee ID: {}", employeeId);
+
+        try {
+            Employees employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Employee not found with ID: " + employeeId));
+
+            String currentPhotoPath = employee.getPhotoPath();
+            if (currentPhotoPath != null && !currentPhotoPath.isEmpty()
+                    && !currentPhotoPath.startsWith("http")
+                    && fileStorageService.fileExists(currentPhotoPath)) {
+                logger.debug("Deleting old profile photo: {}", currentPhotoPath);
+                fileStorageService.deleteFile(currentPhotoPath);
+            }
+
+            String newPhotoPath = fileStorageService.storeProfilePhoto(file, employeeId);
+            logger.debug("New profile photo stored at: {}", newPhotoPath);
+
+            employee.setPhotoPath(newPhotoPath);
+            Employees savedEmployee = employeeRepository.save(employee);
+
+            logger.info("Successfully uploaded profile photo for employee ID: {}", employeeId);
+            return toSummaryDto(savedEmployee);
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Error uploading profile photo for employee ID {}: {}", employeeId, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error uploading profile photo for employee ID {}: {}", employeeId, e.getMessage());
+            throw new RuntimeException("Failed to upload profile photo", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public EmployeeSummaryDto deleteProfilePhoto(Long employeeId) {
+        logger.info("Deleting profile photo for employee ID: {}", employeeId);
+
+        try {
+            Employees employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Employee not found with ID: " + employeeId));
+
+            String currentPhotoPath = employee.getPhotoPath();
+
+            if (currentPhotoPath != null && !currentPhotoPath.isEmpty()
+                    && !currentPhotoPath.startsWith("http")) {
+                if (fileStorageService.fileExists(currentPhotoPath)) {
+                    logger.debug("Deleting profile photo: {}", currentPhotoPath);
+                    fileStorageService.deleteFile(currentPhotoPath);
+                }
+
+                employee.setPhotoPath(
+                        "https://pngtree.com/freepng/male-company-employee-avatar-icon-wearing-a-necktie_8537621.html");
+                Employees savedEmployee = employeeRepository.save(employee);
+
+                logger.info("Successfully deleted profile photo for employee ID: {}", employeeId);
+                return toSummaryDto(savedEmployee);
+            } else {
+                logger.info("No custom profile photo to delete for employee ID: {}", employeeId);
+                return toSummaryDto(employee);
+            }
+
+        } catch (EntityNotFoundException e) {
+            logger.error("Error deleting profile photo for employee ID {}: {}", employeeId, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error deleting profile photo for employee ID {}: {}", employeeId, e.getMessage());
+            throw new RuntimeException("Failed to delete profile photo", e);
         }
     }
 

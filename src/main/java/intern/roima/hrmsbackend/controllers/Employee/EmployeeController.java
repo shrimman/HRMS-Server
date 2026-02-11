@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.dtos.Responses.OrgChartResponseDto;
@@ -62,6 +64,19 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeeSummaryDto>> EmployeesByDesignation(
             @RequestParam("designation") String designation) {
         return ResponseEntity.ok(employeeService.getEmployeesByDesignation(designation));
+    }
+
+    @PostMapping("/profile/photo")
+    public ResponseEntity<?> uploadProfilePhoto(
+            @CurrentUser Long employeeId, @RequestParam("file") MultipartFile file) {
+        EmployeeSummaryDto profile = profileService.uploadProfilePhoto(employeeId, file);
+        return ResponseEntity.ok(profile);
+    }
+
+    @DeleteMapping("/profile/photo")
+    public ResponseEntity<?> deleteProfilePhoto(@CurrentUser Long employeeId) {
+        EmployeeSummaryDto profile = profileService.deleteProfilePhoto(employeeId);
+        return ResponseEntity.ok(profile);
     }
 
 }
