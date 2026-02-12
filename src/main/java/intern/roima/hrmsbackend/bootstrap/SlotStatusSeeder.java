@@ -26,6 +26,7 @@ public class SlotStatusSeeder implements ApplicationListener<ContextRefreshedEve
         String[][] statusData = {
                 { "AVAILABLE", "Slot is available for booking" },
                 { "BOOKED", "Slot has been booked" },
+                { "FULL", "Slot is full, no more bookings allowed"},
                 { "CANCELLED", "Slot has been cancelled" },
                 { "COMPLETED", "Slot event has been completed" }
         };
