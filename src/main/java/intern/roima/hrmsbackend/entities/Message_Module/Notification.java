@@ -32,8 +32,17 @@ public class Notification {
     @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)
     private Employees employee;
 
+    @Column(nullable = false, length = 100)
+    private String title;
+
     @Column(nullable = false, length = 500)
     private String message;
+
+    @Column(nullable = false, length = 50)
+    private String notificationType;
+
+    @Column(nullable = true)
+    private Long relatedEntityId;
 
     @Column(nullable = false)
     private Boolean isRead = false;
