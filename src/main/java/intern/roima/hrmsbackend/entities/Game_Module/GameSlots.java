@@ -1,5 +1,6 @@
 package intern.roima.hrmsbackend.entities.Game_Module;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import intern.roima.hrmsbackend.entities.Employee_Module.Employees;
@@ -34,7 +35,7 @@ public class GameSlots {
     private Games game;
 
     @Column(nullable = false)
-    private LocalDateTime slotDate;
+    private LocalDate slotDate;
 
     @Column(nullable = false)
     private LocalDateTime startDateTime;
