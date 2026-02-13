@@ -36,6 +36,10 @@ public class TravelExpenses {
     private TravelPlans travelPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SubmittedBy", referencedColumnName = "employeeId", nullable = false)
+    private Employees submittedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ExpenseTypeId", referencedColumnName = "expenseTypeId", nullable = false)
     private ExpenseType expenseType;
 

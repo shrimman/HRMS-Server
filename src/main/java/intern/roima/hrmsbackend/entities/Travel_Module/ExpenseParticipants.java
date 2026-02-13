@@ -24,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ExpenseParticipants", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"ExpenseId", "ReceiptId", "EmployeeId"})
+    @UniqueConstraint(columnNames = {"ExpenseId", "EmployeeId"})
 })
 public class ExpenseParticipants {
 
@@ -35,10 +35,6 @@ public class ExpenseParticipants {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ExpenseId", referencedColumnName = "expenseId", nullable = false)
     private TravelExpenses expense;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ReceiptId", referencedColumnName = "expenseReceiptId", nullable = false)
-    private ExpenseReceipt receipt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EmployeeId", referencedColumnName = "employeeId", nullable = false)

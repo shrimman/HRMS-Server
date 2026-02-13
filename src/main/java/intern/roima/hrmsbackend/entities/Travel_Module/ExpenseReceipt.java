@@ -29,6 +29,10 @@ public class ExpenseReceipt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long expenseReceiptId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ExpenseId", referencedColumnName = "expenseId", nullable = false)
+    private TravelExpenses expense;
+
     @Column(nullable = false, length = 255)
     private String fileName;
 
