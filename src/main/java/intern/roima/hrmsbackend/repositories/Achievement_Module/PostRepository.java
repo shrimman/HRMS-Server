@@ -11,14 +11,14 @@ import intern.roima.hrmsbackend.entities.Achievement_Module.AchievementPosts;
 
 public interface PostRepository extends JpaRepository<AchievementPosts, Long> {
 
-    List<AchievementPosts> findByAuthor_EmployeeId(Long employeeId);
+    List<AchievementPosts> findByAuthor_EmployeeIdAndIsDeletedFalse(Long employeeId);
 
-    List<AchievementPosts> findByIsSystemGenerated(Boolean isSystemGenerated);
+    List<AchievementPosts> findByIsSystemGeneratedAndIsDeletedFalse(Boolean isSystemGenerated);
 
-    @Query("SELECT p FROM AchievementPosts p WHERE p.title LIKE %:keyword% OR p.description LIKE %:keyword% ORDER BY p.createdAt DESC")
+    @Query("SELECT p FROM AchievementPosts p WHERE p.isDeleted = false AND (p.title LIKE %:keyword% OR p.description LIKE %:keyword%) ORDER BY p.createdAt DESC")
     List<AchievementPosts> searchByKeyword(@Param("keyword") String keyword);
 
-    List<AchievementPosts> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<AchievementPosts> findByCreatedAtBetweenAndIsDeletedFalse(LocalDateTime startDate, LocalDateTime endDate);
 
-    List<AchievementPosts> findAllByOrderByCreatedAtDesc();
+    List<AchievementPosts> findAllByIsDeletedFalseOrderByCreatedAtDesc();
 }

@@ -8,9 +8,9 @@ import intern.roima.hrmsbackend.entities.Achievement_Module.AchievementComments;
 
 public interface CommentRepository extends JpaRepository<AchievementComments, Long> {
 
-    List<AchievementComments> findByPost_PostIdOrderByCreatedAtAsc(Long postId);
+    List<AchievementComments> findByPost_PostIdAndIsDeletedFalseOrderByCreatedAtAsc(Long postId);
 
-    Long countByPost_PostId(Long postId);
+    Long countByPost_PostIdAndIsDeletedFalse(Long postId);
 
-    List<AchievementComments> findByAuthor_EmployeeId(Long employeeId);
+    List<AchievementComments> findByAuthor_EmployeeIdAndIsDeletedFalse(Long employeeId);
 }

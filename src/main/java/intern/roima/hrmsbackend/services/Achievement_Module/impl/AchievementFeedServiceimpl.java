@@ -33,6 +33,7 @@ import intern.roima.hrmsbackend.repositories.Achievement_Module.PostRepository;
 import intern.roima.hrmsbackend.repositories.Employee_Module.EmployeeRepository;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
 import intern.roima.hrmsbackend.services.Achievement_Module.AchievementFeedService;
+import intern.roima.hrmsbackend.services.Message_Module.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -46,6 +47,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
     private final EmployeeRepository employeeRepository;
     private final ModerationRepository moderationRepository;
     private final ModerationTypeRepository moderationTypeRepository;
+    private final NotificationService notificationService;
 
     public AchievementFeedServiceimpl(
             PostRepository postRepository,
@@ -53,13 +55,15 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
             LikeRepository likeRepository,
             EmployeeRepository employeeRepository,
             ModerationRepository moderationRepository,
-            ModerationTypeRepository moderationTypeRepository) {
+            ModerationTypeRepository moderationTypeRepository,
+            NotificationService notificationService) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.likeRepository = likeRepository;
         this.employeeRepository = employeeRepository;
         this.moderationRepository = moderationRepository;
         this.moderationTypeRepository = moderationTypeRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -68,7 +72,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         logger.info("Fetching all posts for employee ID: {}", currentEmployeeId);
 
         try {
-            List<AchievementPosts> posts = postRepository.findAllByOrderByCreatedAtDesc();
+            List<AchievementPosts> posts = postRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc();
             return posts.stream()
                     .map(post -> toPostDto(post, currentEmployeeId))
                     .toList();
@@ -103,7 +107,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         logger.info("Fetching posts for employee ID: {}", employeeId);
 
         try {
-            List<AchievementPosts> posts = postRepository.findByAuthor_EmployeeId(employeeId);
+            List<AchievementPosts> posts = postRepository.findByAuthor_EmployeeIdAndIsDeletedFalse(employeeId);
             return posts.stream()
                     .map(post -> toPostDto(post, employeeId))
                     .toList();
@@ -119,7 +123,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         logger.info("Fetching system-generated posts");
 
         try {
-            List<AchievementPosts> posts = postRepository.findByIsSystemGenerated(true);
+            List<AchievementPosts> posts = postRepository.findByIsSystemGeneratedAndIsDeletedFalse(true);
             return posts.stream()
                     .map(post -> toPostDto(post, currentEmployeeId))
                     .toList();
@@ -143,6 +147,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
             post.setTitle(postRequest.getTitle().trim());
             post.setDescription(postRequest.getDescription() != null ? postRequest.getDescription().trim() : null);
             post.setIsSystemGenerated(false);
+            post.setIsDeleted(false);
             post.setCreatedAt(LocalDateTime.now());
             post.setUpdatedAt(LocalDateTime.now());
             post.setUpdatedByEmployee(author);
@@ -206,7 +211,9 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
                 throw new InvalidEmployeeDataException("You can only delete your own posts");
             }
 
-            postRepository.delete(post);
+            post.setIsDeleted(true);
+            post.setUpdatedAt(LocalDateTime.now());
+            postRepository.save(post);
             logger.info("Successfully deleted post ID: {}", postId);
         } catch (EntityNotFoundException | InvalidEmployeeDataException e) {
             logger.error("Error deleting post ID {}: {}", postId, e.getMessage());
@@ -226,6 +233,10 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
             AchievementPosts post = postRepository.findById(postId)
                     .orElseThrow(() -> new EntityNotFoundException("Post not found with ID: " + postId));
 
+            if (post.getIsDeleted()) {
+                throw new IllegalArgumentException("Post is already deleted");
+            }
+
             Employees hrEmployee = employeeRepository.findById(hrEmployeeId)
                     .orElseThrow(() -> new EntityNotFoundException("HR employee not found with ID: " + hrEmployeeId));
 
@@ -241,7 +252,15 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
             moderation.setDeletedAt(LocalDateTime.now());
 
             moderationRepository.save(moderation);
-            postRepository.delete(post);
+
+            post.setIsDeleted(true);
+            post.setUpdatedAt(LocalDateTime.now());
+            postRepository.save(post);
+
+            notificationService.sendWarningNotification(
+                    post.getAuthor().getEmployeeId(),
+                    moderationRequest.getReason(),
+                    postId);
 
             logger.info("Successfully deleted post ID: {} by HR with moderation", postId);
         } catch (EntityNotFoundException e) {
@@ -371,6 +390,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
             comment.setPost(post);
             comment.setAuthor(employee);
             comment.setText(commentRequest.getText().trim());
+            comment.setIsDeleted(false);
             comment.setCreatedAt(LocalDateTime.now());
             comment.setUpdatedAt(LocalDateTime.now());
             comment.setUpdatedByEmployee(employee);
@@ -433,7 +453,9 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
                 throw new InvalidEmployeeDataException("You can only delete your own comments");
             }
 
-            commentRepository.delete(comment);
+            comment.setIsDeleted(true);
+            comment.setUpdatedAt(LocalDateTime.now());
+            commentRepository.save(comment);
             logger.info("Successfully deleted comment ID: {}", commentId);
         } catch (EntityNotFoundException | InvalidEmployeeDataException e) {
             logger.error("Error deleting comment ID {}: {}", commentId, e.getMessage());
@@ -454,6 +476,10 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
             AchievementComments comment = commentRepository.findById(commentId)
                     .orElseThrow(() -> new EntityNotFoundException("Comment not found with ID: " + commentId));
 
+            if (comment.getIsDeleted()) {
+                throw new IllegalArgumentException("Comment is already deleted");
+            }
+
             Employees hrEmployee = employeeRepository.findById(hrEmployeeId)
                     .orElseThrow(() -> new EntityNotFoundException("HR employee not found with ID: " + hrEmployeeId));
 
@@ -470,7 +496,12 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
 
             moderationRepository.save(moderation);
 
-            commentRepository.delete(comment);
+            comment.setIsDeleted(true);
+            comment.setUpdatedAt(LocalDateTime.now());
+            commentRepository.save(comment);
+
+            notificationService.sendWarningNotification(comment.getAuthor().getEmployeeId(),
+                    moderationRequest.getReason(), commentId);
             logger.info("Successfully deleted comment ID: {} by HR with moderation", commentId);
         } catch (EntityNotFoundException e) {
             logger.error("Error in HR comment deletion: {}", e.getMessage());
@@ -487,7 +518,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         logger.info("Fetching comment count for post ID: {}", postId);
 
         try {
-            return commentRepository.countByPost_PostId(postId);
+            return commentRepository.countByPost_PostIdAndIsDeletedFalse(postId);
         } catch (DataAccessException e) {
             logger.error("Database error fetching comment count: {}", e.getMessage());
             throw e;
@@ -500,7 +531,8 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         logger.info("Fetching comments for post ID: {}", postId);
 
         try {
-            List<AchievementComments> comments = commentRepository.findByPost_PostIdOrderByCreatedAtAsc(postId);
+            List<AchievementComments> comments = commentRepository
+                    .findByPost_PostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
             return comments.stream()
                     .map(this::toCommentDto)
                     .toList();
@@ -532,7 +564,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         logger.info("Filtering posts by author ID: {}", authorId);
 
         try {
-            List<AchievementPosts> posts = postRepository.findByAuthor_EmployeeId(authorId);
+            List<AchievementPosts> posts = postRepository.findByAuthor_EmployeeIdAndIsDeletedFalse(authorId);
             return posts.stream()
                     .map(post -> toPostDto(post, currentEmployeeId))
                     .toList();
@@ -549,7 +581,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         logger.info("Filtering posts between {} and {}", startDate, endDate);
 
         try {
-            List<AchievementPosts> posts = postRepository.findByCreatedAtBetween(startDate, endDate);
+            List<AchievementPosts> posts = postRepository.findByCreatedAtBetweenAndIsDeletedFalse(startDate, endDate);
             return posts.stream()
                     .map(post -> toPostDto(post, currentEmployeeId))
                     .toList();
@@ -571,7 +603,7 @@ public class AchievementFeedServiceimpl implements AchievementFeedService {
         dto.setIsSystemGenerated(post.getIsSystemGenerated());
         dto.setAuthor(toEmployeeSummaryDto(post.getAuthor()));
         dto.setLikeCount(likeRepository.countByPost_PostId(post.getPostId()));
-        dto.setCommentCount(commentRepository.countByPost_PostId(post.getPostId()));
+        dto.setCommentCount(commentRepository.countByPost_PostIdAndIsDeletedFalse(post.getPostId()));
 
         dto.setIsLikedByCurrentUser(
                 likeRepository.existsByPost_PostIdAndEmployee_EmployeeId(post.getPostId(), currentEmployeeId));

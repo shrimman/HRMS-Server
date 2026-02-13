@@ -50,4 +50,7 @@ public class AchievementComments {
     @JoinColumn(name = "UpdatedById", referencedColumnName = "employeeId")
     private Employees updatedByEmployee;
 
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
 }

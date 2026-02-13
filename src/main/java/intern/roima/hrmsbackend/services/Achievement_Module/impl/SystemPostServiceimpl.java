@@ -63,6 +63,7 @@ public class SystemPostServiceimpl implements SystemPostService {
             post.setTitle(title);
             post.setDescription(description);
             post.setIsSystemGenerated(true);
+            post.setIsDeleted(false);
             post.setCreatedAt(LocalDateTime.now());
             post.setUpdatedAt(LocalDateTime.now());
             post.setUpdatedByEmployee(employee);
@@ -106,6 +107,7 @@ public class SystemPostServiceimpl implements SystemPostService {
             post.setTitle(title);
             post.setDescription(description);
             post.setIsSystemGenerated(true);
+            post.setIsDeleted(false);
             post.setCreatedAt(LocalDateTime.now());
             post.setUpdatedAt(LocalDateTime.now());
             post.setUpdatedByEmployee(employee);
@@ -134,7 +136,7 @@ public class SystemPostServiceimpl implements SystemPostService {
         dto.setIsSystemGenerated(post.getIsSystemGenerated());
         dto.setAuthor(toEmployeeSummaryDto(post.getAuthor()));
         dto.setLikeCount(likeRepository.countByPost_PostId(post.getPostId()));
-        dto.setCommentCount(commentRepository.countByPost_PostId(post.getPostId()));
+        dto.setCommentCount(commentRepository.countByPost_PostIdAndIsDeletedFalse(post.getPostId()));
         dto.setIsLikedByCurrentUser(false);
         return dto;
     }

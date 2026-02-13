@@ -52,4 +52,7 @@ public class AchievementPosts {
     @Column(nullable = false)
     private Boolean isSystemGenerated;
 
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
 }
