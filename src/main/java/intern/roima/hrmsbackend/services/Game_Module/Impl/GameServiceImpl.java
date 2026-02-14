@@ -308,6 +308,17 @@ public class GameServiceImpl implements GameService {
             throw new IllegalArgumentException("End date must be after or equal to start date");
         }
 
+        LocalDateTime rangeStart = LocalDateTime.of(request.getStartDate(), LocalTime.MIN);
+        LocalDateTime rangeEnd = LocalDateTime.of(request.getEndDate(), LocalTime.MAX);
+        List<GameSlots> existingSlots = gameSlotsRepository.findByGame_GameIdAndStartDateTimeBetween(
+                gameId, rangeStart, rangeEnd);
+
+        if (!existingSlots.isEmpty()) {
+            logger.error("Slots already exist for game ID: {} from {} to {}. Cannot generate duplicate slots.",
+                    gameId, request.getStartDate(), request.getEndDate());
+            throw new IllegalStateException("Slots already exist for this game in the specified date range. Cannot generate duplicate slots.");
+        }
+
         SlotStatus availableStatus = slotStatusRepository.findByStatusName(SLOT_STATUS_AVAILABLE)
                 .orElseThrow(() -> new EntityNotFoundException("Slot status 'AVAILABLE' not found"));
 
