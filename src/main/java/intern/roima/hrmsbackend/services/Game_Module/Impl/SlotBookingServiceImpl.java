@@ -83,8 +83,8 @@ public class SlotBookingServiceImpl implements SlotBookingService {
             throw new IllegalStateException("Employee account is inactive");
         }
 
-        if (!Arrays.asList(SLOT_STATUS_AVAILABLE, SLOT_STATUS_BOOKED).contains(slot.getStatus().getStatusName())) {
-            throw new IllegalStateException("Slot is not available for booking");
+        if (!SLOT_STATUS_AVAILABLE.equals(slot.getStatus().getStatusName())) {
+            throw new IllegalStateException("Slot is not available for booking. Only AVAILABLE slots can be booked");
         }
 
         if (hasEmployeeBookedSlotOnDate(employeeId, slot.getSlotDate())) {
@@ -95,9 +95,9 @@ public class SlotBookingServiceImpl implements SlotBookingService {
             throw new IllegalStateException("You are already a participant in another booking on this date");
         }
 
-        Long currentParticipants = slotParticipantsRepository.countActiveParticipantsBySlot(request.getSlotId());
-        if (currentParticipants >= slot.getMaxPlayers()) {
-            throw new IllegalStateException("Slot is full and cannot accept more bookings");
+        List<SlotBookings> activeBookings = slotBookingsRepository.findActiveBookingsBySlot(request.getSlotId());
+        if (!activeBookings.isEmpty()) {
+            throw new IllegalStateException("Slot is already booked by another employee");
         }
 
         BookingStatus activeStatus = bookingStatusRepository.findByStatusName(BOOKING_STATUS_ACTIVE)
@@ -149,7 +149,7 @@ public class SlotBookingServiceImpl implements SlotBookingService {
                 }
 
                 Long totalParticipants = slotParticipantsRepository.countActiveParticipantsBySlot(request.getSlotId());
-                if (totalParticipants >= slot.getMaxPlayers()) {
+                if (totalParticipants + 1 >= slot.getMaxPlayers()) {
                     throw new IllegalStateException("Slot is full and cannot accept more participants");
                 }
 
@@ -379,7 +379,8 @@ public class SlotBookingServiceImpl implements SlotBookingService {
 
         Long currentParticipants = slotParticipantsRepository
                 .countActiveParticipantsBySlot(booking.getSlot().getSlotId());
-        if (currentParticipants >= booking.getSlot().getMaxPlayers()) {
+        // Include the booking owner in the participant count
+        if (currentParticipants + 1 >= booking.getSlot().getMaxPlayers()) {
             throw new IllegalStateException("Slot is full and cannot accept more participants");
         }
 
