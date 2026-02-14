@@ -24,7 +24,8 @@ public class ExpenseStatusSeeder implements ApplicationListener<ContextRefreshed
 
     private void loadExpenseStatuses() {
         String[] statusNames = {
-                "PENDING",
+                "DRAFT",
+                "SUBMITTED",
                 "APPROVED",
                 "REJECTED"
         };
