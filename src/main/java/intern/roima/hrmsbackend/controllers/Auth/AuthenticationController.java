@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -109,5 +111,30 @@ public class AuthenticationController {
         authResponse.setUser(userDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AuthenticationResponse> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Employees employee = (Employees) authentication.getPrincipal();
+
+        AuthenticationResponse authResponse = new AuthenticationResponse();
+        authResponse.setSuccess(true);
+        authResponse.setMessage("Current user retrieved successfully");
+
+        UserDto userDto = new UserDto();
+        userDto.setEmployeeId(employee.getEmployeeId());
+        userDto.setEmail(employee.getEmail());
+        userDto.setFirstName(employee.getFirstName());
+        userDto.setLastName(employee.getLastName());
+        userDto.setRoleName(employee.getRole().getRoleName());
+        authResponse.setUser(userDto);
+
+        return ResponseEntity.ok(authResponse);
     }
 }
