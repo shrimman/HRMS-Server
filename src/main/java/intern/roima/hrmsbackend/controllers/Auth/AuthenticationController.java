@@ -137,4 +137,22 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(authResponse);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<AuthenticationResponse> logout(HttpServletResponse response) {
+        SecurityContextHolder.clearContext();
+
+        Cookie cookie = new Cookie("authToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        AuthenticationResponse authResponse = new AuthenticationResponse();
+        authResponse.setSuccess(true);
+        authResponse.setMessage("Logout successful");
+
+        return ResponseEntity.ok(authResponse);
+    }
 }
