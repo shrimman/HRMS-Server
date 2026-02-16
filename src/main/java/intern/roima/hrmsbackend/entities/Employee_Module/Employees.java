@@ -72,7 +72,7 @@ public class Employees implements UserDetails {
     private LocalDate dateOfJoining;
 
     @Column(nullable = false)
-    private String photoPath = "https://pngtree.com/freepng/male-company-employee-avatar-icon-wearing-a-necktie_8537621.html";
+    private String photoPath = "default-employee.png";
 
     @Column(nullable = false)
     private boolean isActive = true;

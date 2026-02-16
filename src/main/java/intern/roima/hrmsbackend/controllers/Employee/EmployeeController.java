@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import intern.roima.hrmsbackend.dtos.Requests.UpdateEmployeeDto;
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.dtos.Responses.OrgChartResponseDto;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
@@ -47,7 +48,7 @@ public class EmployeeController {
 
     @PostMapping("/profile")
     public ResponseEntity<?> updateCurrentUserProfile(@CurrentUser Long employeeId,
-            @RequestBody EmployeeSummaryDto updatedProfile) {
+            @RequestBody UpdateEmployeeDto updatedProfile) {
         EmployeeSummaryDto profile = profileService.updateMyProfile(employeeId, updatedProfile);
         return ResponseEntity.ok(profile);
     }
@@ -79,4 +80,15 @@ public class EmployeeController {
         return ResponseEntity.ok(profile);
     }
 
+    @GetMapping("/departments")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
+    public ResponseEntity<List<String>> getAllDepartments() {
+        return ResponseEntity.ok(employeeService.getAllDepartments());
+    }
+
+    @GetMapping("/designations")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
+    public ResponseEntity<List<String>> getAllDesignations() {
+        return ResponseEntity.ok(employeeService.getAllDesignations());
+    }
 }

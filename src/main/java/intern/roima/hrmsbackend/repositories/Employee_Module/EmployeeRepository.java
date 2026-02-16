@@ -36,23 +36,24 @@ public interface EmployeeRepository extends JpaRepository<Employees, Long> {
     @Query("SELECT e FROM Employees e WHERE e.role.roleName = :roleName AND e.isActive = true")
     List<Employees> findByRoleName(@Param("roleName") String roleName);
 
-    @Query("SELECT e FROM Employees e WHERE " +
-            "e.isActive = true AND " +
-            "(:query IS NULL OR :query = '' OR " +
-            "LOWER(e.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-            "LOWER(e.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-            "LOWER(e.email) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
-            "(:department IS NULL OR :department = '' OR LOWER(e.department.departmentName) = LOWER(:department)) AND "
-            +
-            "(:designation IS NULL OR :designation = '' OR LOWER(e.designation.designationName) = LOWER(:designation)) AND "
-            +
-            "(:role IS NULL OR :role = '' OR LOWER(e.role.roleName) = LOWER(:role))")
-    Page<Employees> searchEmployees(
+    @Query("SELECT DISTINCT e FROM Employees e " +
+            "LEFT JOIN e.department dept " +
+            "LEFT JOIN e.designation desig " +
+            "LEFT JOIN e.role r " +
+            "WHERE e.isActive = true " +
+            "AND (:query IS NULL OR :query = '' OR " +
+            "    LOWER(e.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "    LOWER(e.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "    LOWER(e.email) LIKE LOWER(CONCAT('%', :query, '%'))) " +
+            "AND (:department IS NULL OR :department = '' OR LOWER(dept.departmentName) = LOWER(:department)) " +
+            "AND (:designation IS NULL OR :designation = '' OR LOWER(desig.designationName) = LOWER(:designation)) " +
+            "AND (:role IS NULL OR :role = '' OR LOWER(r.roleName) = LOWER(:role)) " +
+            "ORDER BY e.lastName ASC, e.firstName ASC")
+    List<Employees> searchEmployees(
             @Param("query") String query,
             @Param("department") String department,
             @Param("designation") String designation,
-            @Param("role") String role,
-            Pageable pageable);
+            @Param("role") String role);
 
     Page<Employees> findByIsActive(boolean isActive, Pageable pageable);
 

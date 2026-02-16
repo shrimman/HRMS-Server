@@ -9,17 +9,17 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.dtos.Responses.OrgChartResponseDto;
+import intern.roima.hrmsbackend.entities.Employee_Module.Departments;
+import intern.roima.hrmsbackend.entities.Employee_Module.Designations;
 import intern.roima.hrmsbackend.entities.Employee_Module.Employees;
 import intern.roima.hrmsbackend.exceptions.InvalidEmployeeDataException;
+import intern.roima.hrmsbackend.repositories.Employee_Module.DepartmentRepository;
+import intern.roima.hrmsbackend.repositories.Employee_Module.DesignationRepository;
 import intern.roima.hrmsbackend.repositories.Employee_Module.EmployeeRepository;
 import intern.roima.hrmsbackend.services.Employee_Module.EmployeeDirectoryService;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,12 +29,17 @@ public class EmployeeDirectoryImpl implements EmployeeDirectoryService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeDirectoryImpl.class);
     private static final int MAX_MANAGER_CHAIN_DEPTH = 20;
-    private static final int MAX_PAGE_SIZE = 100;
 
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+    private final DesignationRepository designationRepository;
 
-    public EmployeeDirectoryImpl(EmployeeRepository employeeRepository) {
+    public EmployeeDirectoryImpl(EmployeeRepository employeeRepository,
+            DepartmentRepository departmentRepository,
+            DesignationRepository designationRepository) {
         this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
+        this.designationRepository = designationRepository;
     }
 
     @Override
@@ -134,34 +139,26 @@ public class EmployeeDirectoryImpl implements EmployeeDirectoryService {
             String query,
             String department,
             String designation,
-            String role,
-            int page,
-            int size) {
+            String role) {
 
-        logger.info("Searching employees with query: {}, department: {}, designation: {}, role: {}, page: {}, size: {}",
-                query, department, designation, role, page, size);
+        logger.info("Searching employees with query: '{}', department: '{}', designation: '{}', role: '{}'",
+                query, department, designation, role);
 
         try {
-            int validatedSize = Math.min(size > 0 ? size : 50, MAX_PAGE_SIZE);
-            Pageable pageable = PageRequest.of(
-                    page,
-                    validatedSize,
-                    Sort.by("lastName").ascending().and(Sort.by("firstName").ascending()));
-
-            Page<Employees> employeePage = employeeRepository.searchEmployees(
+            List<Employees> employees = employeeRepository.searchEmployees(
                     query,
                     department,
                     designation,
-                    role,
-                    pageable);
+                    role);
 
-            List<EmployeeSummaryDto> results = employeePage
+            logger.info("Repository returned {} employees", employees.size());
+
+            List<EmployeeSummaryDto> results = employees
                     .stream()
                     .map(this::toSummaryDto)
                     .toList();
 
-            logger.debug("Search returned {} results out of {} total",
-                    results.size(), employeePage.getTotalElements());
+            logger.info("Search returned {} results", results.size());
 
             return results;
 
@@ -235,5 +232,43 @@ public class EmployeeDirectoryImpl implements EmployeeDirectoryService {
             dto.setManagerName(employee.getManager().getFirstName() + " " + employee.getManager().getLastName());
         }
         return dto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getAllDepartments() {
+        logger.info("Fetching all department names");
+
+        try {
+            List<String> departmentNames = departmentRepository.findAll()
+                    .stream()
+                    .map(Departments::getDepartmentName)
+                    .toList();
+            logger.debug("Successfully fetched {} department names", departmentNames.size());
+            return departmentNames;
+
+        } catch (DataAccessException e) {
+            logger.error("Database error fetching all departments: {}", e.getMessage());
+            throw new RuntimeException("Database error while fetching departments", e);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getAllDesignations() {
+        logger.info("Fetching all designation names");
+
+        try {
+            List<String> designationNames = designationRepository.findAll()
+                    .stream()
+                    .map(Designations::getDesignationName)
+                    .toList();
+            logger.debug("Successfully fetched {} designation names", designationNames.size());
+            return designationNames;
+
+        } catch (DataAccessException e) {
+            logger.error("Database error fetching all designations: {}", e.getMessage());
+            throw new RuntimeException("Database error while fetching designations", e);
+        }
     }
 }

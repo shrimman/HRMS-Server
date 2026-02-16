@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import intern.roima.hrmsbackend.dtos.Requests.UpdateEmployeeDto;
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.entities.Employee_Module.Departments;
 import intern.roima.hrmsbackend.entities.Employee_Module.Designations;
@@ -69,7 +70,7 @@ public class EmployeeProfileServiceimpl implements EmployeeProfileService {
 
     @Override
     @Transactional
-    public EmployeeSummaryDto updateMyProfile(@CurrentUser Long myEmployeeId, EmployeeSummaryDto updatedProfile) {
+    public EmployeeSummaryDto updateMyProfile(@CurrentUser Long myEmployeeId, UpdateEmployeeDto updatedProfile) {
         logger.info("Updating profile for employee ID: {}", myEmployeeId);
 
         try {
@@ -81,14 +82,7 @@ public class EmployeeProfileServiceimpl implements EmployeeProfileService {
                     .orElseThrow(() -> new EntityNotFoundException(
                             "Employee not found with ID: " + myEmployeeId));
 
-            if (updatedProfile.getEmail() != null &&
-                    !existingEmployee.getEmail().equals(updatedProfile.getEmail())) {
-                logger.warn("Employee {} attempted to change email from {} to {}",
-                        myEmployeeId, existingEmployee.getEmail(), updatedProfile.getEmail());
-                throw new InvalidEmployeeDataException("Email cannot be changed through profile update");
-            }
-
-            updateEmployeeFromDto(existingEmployee, updatedProfile);
+            updateEmployeeFromUpdateDto(existingEmployee, updatedProfile);
 
             Employees savedEmployee = employeeRepository.save(existingEmployee);
             logger.info("Successfully updated profile for employee ID: {}", myEmployeeId);
@@ -195,15 +189,16 @@ public class EmployeeProfileServiceimpl implements EmployeeProfileService {
         return dto;
     }
 
-    private void updateEmployeeFromDto(Employees employee, EmployeeSummaryDto dto) {
+
+    private void updateEmployeeFromUpdateDto(Employees employee, UpdateEmployeeDto dto) {
         if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
             employee.setFirstName(dto.getFirstName().trim());
         }
         if (dto.getLastName() != null && !dto.getLastName().isBlank()) {
             employee.setLastName(dto.getLastName().trim());
         }
-        if (dto.getPhotoPath() != null && !dto.getPhotoPath().isBlank()) {
-            employee.setPhotoPath(dto.getPhotoPath().trim());
+        if (dto.getDateOfBirth() != null) {
+            employee.setDateOfBirth(dto.getDateOfBirth());
         }
     }
 

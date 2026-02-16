@@ -29,29 +29,27 @@ public class HRController {
     }
 
     @GetMapping("/allemployees")
-    @PreAuthorize("hasAnyRole('HR')")
+    @PreAuthorize("hasAnyRole('HR','MANAGER','EMPLOYEE')")
     public ResponseEntity<?> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('HR', 'MANAGER') or #id == authentication.principal.employeeId")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE') or #id == authentication.principal.employeeId")
     public ResponseEntity<EmployeeSummaryDto> getEmployeeById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(profileService.getEmployeeProfileById(id));
     }
 
-    @GetMapping("/searchEmployee/{query}")
-    @PreAuthorize("hasAnyRole('HR', 'MANAGER')")
+    @GetMapping("/searchEmployee")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER','EMPLOYEE')")
     public ResponseEntity<?> searchEmployees(
             @CurrentUser Long currentUserId,
-            @PathVariable("query") String query,
+            @RequestParam(name = "query", required = false) String query,
             @RequestParam(name = "department", required = false) String department,
             @RequestParam(name = "designation", required = false) String designation,
-            @RequestParam(name = "role", required = false) String role,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size) {
+            @RequestParam(name = "role", required = false) String role) {
         return ResponseEntity
-                .ok(employeeService.searchEmployees(currentUserId, query, department, designation, role, page, size));
+                .ok(employeeService.searchEmployees(currentUserId, query, department, designation, role));
     }
 
     @PostMapping("/profile/{id}")

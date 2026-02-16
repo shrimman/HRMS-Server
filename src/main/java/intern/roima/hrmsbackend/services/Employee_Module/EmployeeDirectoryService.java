@@ -13,9 +13,13 @@ public interface EmployeeDirectoryService {
     OrgChartResponseDto getOrgChart(Long employeeId);
 
     List<EmployeeSummaryDto> searchEmployees(@CurrentUser Long currentUserId, String query, String department,
-            String designation, String role, int page, int size);
+            String designation, String role);
 
     List<EmployeeSummaryDto> getEmployeesByDepartment(String department);
 
     List<EmployeeSummaryDto> getEmployeesByDesignation(String designation);
+
+    List<String> getAllDepartments();
+
+    List<String> getAllDesignations();
 }
