@@ -2,6 +2,7 @@ package intern.roima.hrmsbackend.controllers.Auth;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -78,6 +79,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
+    @PreAuthorize("hasRole('HR')")
     public ResponseEntity<AuthenticationResponse> signup(@Valid @RequestBody RegistrationRequest request) {
         if (employeeRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already registered");

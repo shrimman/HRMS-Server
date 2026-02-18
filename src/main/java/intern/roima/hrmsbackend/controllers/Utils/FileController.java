@@ -26,8 +26,8 @@ public class FileController {
 
     @GetMapping("/{category}/{filename:.+}")
     public ResponseEntity<Resource> serveFile(
-            @PathVariable String category,
-            @PathVariable String filename,
+            @PathVariable("category") String category,
+            @PathVariable("filename") String filename,
             HttpServletRequest request) throws IOException {
 
         String filePath = category + "/" + filename;
