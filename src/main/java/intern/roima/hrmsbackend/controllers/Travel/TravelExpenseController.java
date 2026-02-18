@@ -25,6 +25,8 @@ import intern.roima.hrmsbackend.dtos.Requests.ExpenseFilterRequest;
 import intern.roima.hrmsbackend.dtos.Requests.UpdateTravelExpenseRequest;
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.dtos.Responses.ExpenseReceiptDto;
+import intern.roima.hrmsbackend.dtos.Responses.ExpenseStatusTypeDto;
+import intern.roima.hrmsbackend.dtos.Responses.ExpenseTypeDto;
 import intern.roima.hrmsbackend.dtos.Responses.TravelExpenseDto;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
 import intern.roima.hrmsbackend.services.Travel_Module.TravelExpenseService;
@@ -41,7 +43,7 @@ public class TravelExpenseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<TravelExpenseDto> createExpense(
             @Valid @RequestBody CreateTravelExpenseRequest request,
             @CurrentUser Long employeeId) {
@@ -50,7 +52,7 @@ public class TravelExpenseController {
     }
 
     @PutMapping("/{expenseId}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<TravelExpenseDto> updateExpense(
             @PathVariable("expenseId") Long expenseId,
             @Valid @RequestBody UpdateTravelExpenseRequest request,
@@ -59,7 +61,7 @@ public class TravelExpenseController {
     }
 
     @PostMapping("/{expenseId}/submit")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<TravelExpenseDto> submitExpense(
             @PathVariable("expenseId") Long expenseId,
             @CurrentUser Long employeeId) {
@@ -81,7 +83,7 @@ public class TravelExpenseController {
     }
 
     @GetMapping("/my-expenses")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<List<TravelExpenseDto>> getMyExpenses(
             @CurrentUser Long employeeId) {
         return ResponseEntity.ok(travelExpenseService.getExpensesForEmployee(employeeId));
@@ -148,7 +150,8 @@ public class TravelExpenseController {
             @PathVariable("expenseId") Long expenseId,
             @Valid @RequestBody ApproveExpenseRequest request,
             @CurrentUser Long managerId) {
-        return ResponseEntity.ok(travelExpenseService.approveExpenseByManager(expenseId, managerId, request.getRemarks()));
+        return ResponseEntity
+                .ok(travelExpenseService.approveExpenseByManager(expenseId, managerId, request.getRemarks()));
     }
 
     @PostMapping("/{expenseId}/reject-by-manager")
@@ -157,7 +160,8 @@ public class TravelExpenseController {
             @PathVariable("expenseId") Long expenseId,
             @Valid @RequestBody ApproveExpenseRequest request,
             @CurrentUser Long managerId) {
-        return ResponseEntity.ok(travelExpenseService.rejectExpenseByManager(expenseId, managerId, request.getRemarks()));
+        return ResponseEntity
+                .ok(travelExpenseService.rejectExpenseByManager(expenseId, managerId, request.getRemarks()));
     }
 
     @GetMapping("/manager/pending")
@@ -177,7 +181,7 @@ public class TravelExpenseController {
     }
 
     @PostMapping("/{expenseId}/receipts/upload")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<ExpenseReceiptDto> uploadReceipt(
             @PathVariable("expenseId") Long expenseId,
             @RequestParam("file") MultipartFile file,
@@ -196,7 +200,7 @@ public class TravelExpenseController {
     }
 
     @DeleteMapping("/receipts/{receiptId}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<Void> deleteReceipt(
             @PathVariable("receiptId") Long receiptId,
             @CurrentUser Long employeeId) {
@@ -205,21 +209,22 @@ public class TravelExpenseController {
     }
 
     @PostMapping("/{expenseId}/participants/{participantId}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<Void> addExpenseParticipant(
             @PathVariable("expenseId") Long expenseId,
             @PathVariable("participantId") Long participantId,
             @CurrentUser Long employeeId) {
-        travelExpenseService.addExpenseParticipant(expenseId, participantId);
+        travelExpenseService.addExpenseParticipant(expenseId, participantId, employeeId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{expenseId}/participants/{participantId}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<Void> removeExpenseParticipant(
+            @PathVariable("expenseId") Long expenseId,
             @PathVariable("participantId") Long participantId,
             @CurrentUser Long employeeId) {
-        travelExpenseService.removeExpenseParticipant(participantId, employeeId);
+        travelExpenseService.removeExpenseParticipant(expenseId, participantId, employeeId);
         return ResponseEntity.noContent().build();
     }
 
@@ -229,4 +234,17 @@ public class TravelExpenseController {
             @PathVariable("expenseId") Long expenseId) {
         return ResponseEntity.ok(travelExpenseService.getExpenseParticipants(expenseId));
     }
+
+    @GetMapping("/status-types")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
+    public ResponseEntity<List<ExpenseStatusTypeDto>> getExpenseStatusTypes() {
+        return ResponseEntity.ok(travelExpenseService.getExpenseStatusTypes());
+    }
+
+    @GetMapping("/expense-types")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
+    public ResponseEntity<List<ExpenseTypeDto>> getAllExpenseTypes() {
+        return ResponseEntity.ok(travelExpenseService.getAllExpenseTypes());
+    }
+
 }

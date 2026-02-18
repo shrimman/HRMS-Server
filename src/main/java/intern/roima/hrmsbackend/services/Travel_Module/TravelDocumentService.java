@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import intern.roima.hrmsbackend.dtos.Requests.UploadTravelDocumentRequest;
+import intern.roima.hrmsbackend.dtos.Responses.DocumentTypeDto;
 import intern.roima.hrmsbackend.dtos.Responses.TravelDocumentDto;
 
 public interface TravelDocumentService {
@@ -28,5 +29,7 @@ public interface TravelDocumentService {
     List<TravelDocumentDto> getDocumentsUploadedByEmployee(Long travelPlanId, Long employeeId);
 
     void deleteDocument(Long documentId, Long employeeId);
+
+    List<DocumentTypeDto> getAllDocumentTypes();
 
 }

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import intern.roima.hrmsbackend.dtos.Requests.UpdateEmployeeDto;
+import intern.roima.hrmsbackend.dtos.Requests.UpdateEmployeeProfileDto;
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.entities.Employee_Module.Departments;
 import intern.roima.hrmsbackend.entities.Employee_Module.Designations;
@@ -100,37 +101,52 @@ public class EmployeeProfileServiceimpl implements EmployeeProfileService {
 
     @Override
     @Transactional
-    public EmployeeSummaryDto updateEmployeeProfile(Long employeeId, EmployeeSummaryDto updatedProfile) {
+    public EmployeeSummaryDto updateEmployeeProfile(Long employeeId, UpdateEmployeeProfileDto updatedProfile) {
         logger.info("Updating employee profile for employee ID: {}", employeeId);
 
         try {
+            if (updatedProfile == null) {
+                throw new InvalidEmployeeDataException("Profile update data cannot be null");
+            }
+
             Employees existingEmployee = employeeRepository.findById(employeeId)
                     .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + employeeId));
 
-            if (updatedProfile.getRole() != null && updatedProfile.getRole().getRoleId() != null) {
-                Roles role = roleRepository.findById(updatedProfile.getRole().getRoleId().intValue())
+            if (updatedProfile.getRoleId() != null) {
+                Roles role = roleRepository.findById(updatedProfile.getRoleId())
                         .orElseThrow(() -> new EntityNotFoundException(
-                                "Role not found with ID: " + updatedProfile.getRole().getRoleId()));
+                                "Role not found with ID: " + updatedProfile.getRoleId()));
                 existingEmployee.setRole(role);
             }
 
-            if (updatedProfile.getDepartment() != null && updatedProfile.getDepartment().getDepartmentId() != null) {
-                Departments department = departmentRepository.findById(updatedProfile.getDepartment().getDepartmentId())
+            if (updatedProfile.getDepartmentId() != null) {
+                Departments department = departmentRepository.findById(updatedProfile.getDepartmentId())
                         .orElseThrow(() -> new EntityNotFoundException(
-                                "Department not found with ID: " + updatedProfile.getDepartment().getDepartmentId()));
+                                "Department not found with ID: " + updatedProfile.getDepartmentId()));
                 existingEmployee.setDepartment(department);
             }
 
-            if (updatedProfile.getDesignation() != null && updatedProfile.getDesignation().getDesignationId() != null) {
-                Designations designation = designationRepository
-                        .findById(updatedProfile.getDesignation().getDesignationId())
+            if (updatedProfile.getDesignationId() != null) {
+                Designations designation = designationRepository.findById(updatedProfile.getDesignationId())
                         .orElseThrow(() -> new EntityNotFoundException(
-                                "Designation not found with ID: "
-                                        + updatedProfile.getDesignation().getDesignationId()));
+                                "Designation not found with ID: " + updatedProfile.getDesignationId()));
                 existingEmployee.setDesignation(designation);
             }
 
-            existingEmployee.setActive(updatedProfile.isActive());
+            if (updatedProfile.getManagerId() != null) {
+                Employees manager = employeeRepository.findById(updatedProfile.getManagerId())
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Manager not found with ID: " + updatedProfile.getManagerId()));
+                existingEmployee.setManager(manager);
+            }
+
+            if (updatedProfile.getDateOfJoining() != null) {
+                existingEmployee.setDateOfJoining(updatedProfile.getDateOfJoining());
+            }
+
+            if (updatedProfile.getIsActive() != null) {
+                existingEmployee.setActive(updatedProfile.getIsActive());
+            }
 
             Employees savedEmployee = employeeRepository.save(existingEmployee);
             logger.info("Successfully updated employee profile for employee ID: {}", employeeId);
@@ -188,7 +204,6 @@ public class EmployeeProfileServiceimpl implements EmployeeProfileService {
         }
         return dto;
     }
-
 
     private void updateEmployeeFromUpdateDto(Employees employee, UpdateEmployeeDto dto) {
         if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {

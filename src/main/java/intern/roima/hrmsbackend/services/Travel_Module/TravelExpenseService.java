@@ -11,6 +11,8 @@ import intern.roima.hrmsbackend.dtos.Requests.ExpenseFilterRequest;
 import intern.roima.hrmsbackend.dtos.Requests.UpdateTravelExpenseRequest;
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.dtos.Responses.ExpenseReceiptDto;
+import intern.roima.hrmsbackend.dtos.Responses.ExpenseStatusTypeDto;
+import intern.roima.hrmsbackend.dtos.Responses.ExpenseTypeDto;
 import intern.roima.hrmsbackend.dtos.Responses.TravelExpenseDto;
 
 public interface TravelExpenseService {
@@ -61,10 +63,13 @@ public interface TravelExpenseService {
 
     void deleteReceipt(Long receiptId, Long employeeId);
 
-    void addExpenseParticipant(Long expenseId, Long employeeId);
+    void addExpenseParticipant(Long expenseId, Long employeeIdToAdd, Long currentUserId);
 
-    void removeExpenseParticipant(Long participantId, Long employeeId);
+    void removeExpenseParticipant(Long expenseId,Long participantId, Long employeeId);
 
     List<EmployeeSummaryDto> getExpenseParticipants(Long expenseId);
 
+    List<ExpenseStatusTypeDto> getExpenseStatusTypes();
+
+    List<ExpenseTypeDto> getAllExpenseTypes();
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import intern.roima.hrmsbackend.dtos.Requests.UploadTravelDocumentRequest;
+import intern.roima.hrmsbackend.dtos.Responses.DocumentTypeDto;
 import intern.roima.hrmsbackend.dtos.Responses.TravelDocumentDto;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
 import intern.roima.hrmsbackend.services.Travel_Module.TravelDocumentService;
@@ -48,6 +49,12 @@ public class TravelDocumentController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(travelDocumentService.uploadDocument(request, file, uploadedById));
+    }
+
+    @GetMapping("/types")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
+    public ResponseEntity<List<DocumentTypeDto>> getAllDocumentTypes() {
+        return ResponseEntity.ok(travelDocumentService.getAllDocumentTypes());
     }
 
     @GetMapping("/{documentId}")
@@ -94,7 +101,7 @@ public class TravelDocumentController {
     }
 
     @GetMapping("/travel/{travelId}/by-hr")
-    @PreAuthorize("hasRole('HR')")
+    @PreAuthorize("hasAnyRole('HR','MANAGER', 'EMPLOYEE')")
     public ResponseEntity<List<TravelDocumentDto>> getDocumentsUploadedByHR(
             @PathVariable("travelId") Long travelId) {
         return ResponseEntity.ok(travelDocumentService.getDocumentsUploadedByHR(travelId));

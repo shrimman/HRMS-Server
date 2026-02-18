@@ -73,7 +73,7 @@ public class TravelPlanController {
     }
 
     @GetMapping("/my-travels")
-    @PreAuthorize("hasAnyRole('MANAGER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('HR','MANAGER', 'EMPLOYEE')")
     public ResponseEntity<List<TravelPlanDto>> getMyTravelPlans(
             @CurrentUser Long employeeId) {
         return ResponseEntity.ok(travelService.getTravelPlansForEmployee(employeeId));

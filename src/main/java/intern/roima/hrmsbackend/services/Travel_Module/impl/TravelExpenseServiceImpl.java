@@ -18,6 +18,8 @@ import intern.roima.hrmsbackend.dtos.Requests.ExpenseFilterRequest;
 import intern.roima.hrmsbackend.dtos.Requests.UpdateTravelExpenseRequest;
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.dtos.Responses.ExpenseReceiptDto;
+import intern.roima.hrmsbackend.dtos.Responses.ExpenseStatusTypeDto;
+import intern.roima.hrmsbackend.dtos.Responses.ExpenseTypeDto;
 import intern.roima.hrmsbackend.dtos.Responses.TravelExpenseDto;
 import intern.roima.hrmsbackend.entities.Employee_Module.Employees;
 import intern.roima.hrmsbackend.entities.Travel_Module.ExpenseParticipants;
@@ -251,7 +253,8 @@ public class TravelExpenseServiceImpl implements TravelExpenseService {
 
         logger.debug("Expense ID: {} has {} receipts (minimum required: {})",
                 expenseId, receipts.size(), MIN_RECEIPTS_REQUIRED);
-
+        logger.info("Expense ID: {} has {} receipts (minimum required: {})",
+                expenseId, receipts.size(), MIN_RECEIPTS_REQUIRED, hasMinimum ? "meets" : "does not meet");
         return hasMinimum;
     }
 
@@ -843,20 +846,27 @@ public class TravelExpenseServiceImpl implements TravelExpenseService {
 
     @Override
     @Transactional
-    public void addExpenseParticipant(Long expenseId, Long employeeId) {
-        logger.info("Adding participant employee ID: {} to expense ID: {}", employeeId, expenseId);
+    public void addExpenseParticipant(Long expenseId, Long employeeIdToAdd, Long currentUserId) {
+        logger.info("Adding participant employee ID: {} to expense ID: {} by employee ID: {}", employeeIdToAdd,
+                expenseId, currentUserId);
 
         try {
             TravelExpenses expense = travelExpenseRepository.findById(expenseId)
                     .orElseThrow(() -> new EntityNotFoundException("Expense not found with ID: " + expenseId));
 
-            Employees employee = employeeRepository.findById(employeeId)
-                    .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + employeeId));
+            if (!expense.getSubmittedBy().getEmployeeId().equals(currentUserId)) {
+                logger.warn("User {} attempted to add participant to expense {} submitted by {}",
+                        currentUserId, expenseId, expense.getSubmittedBy().getEmployeeId());
+                throw new IllegalArgumentException("Only the expense submitter can add participants");
+            }
+
+            Employees employee = employeeRepository.findById(employeeIdToAdd)
+                    .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + employeeIdToAdd));
 
             List<ExpenseParticipants> existingParticipants = expenseParticipantsRepository
                     .findByExpense_ExpenseId(expenseId);
             boolean alreadyParticipant = existingParticipants.stream()
-                    .anyMatch(p -> p.getEmployee().getEmployeeId().equals(employeeId));
+                    .anyMatch(p -> p.getEmployee().getEmployeeId().equals(employeeIdToAdd));
 
             if (alreadyParticipant) {
                 throw new IllegalArgumentException("Employee is already a participant in this expense");
@@ -871,7 +881,7 @@ public class TravelExpenseServiceImpl implements TravelExpenseService {
 
             expenseParticipantsRepository.save(participant);
 
-            logger.info("Successfully added participant employee ID: {} to expense ID: {}", employeeId, expenseId);
+            logger.info("Successfully added participant employee ID: {} to expense ID: {}", employeeIdToAdd, expenseId);
 
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             logger.error("Error adding expense participant: {}", e.getMessage());
@@ -884,14 +894,27 @@ public class TravelExpenseServiceImpl implements TravelExpenseService {
 
     @Override
     @Transactional
-    public void removeExpenseParticipant(Long participantId, Long employeeId) {
-        logger.info("Removing participant ID: {} by employee ID: {}", participantId, employeeId);
+    public void removeExpenseParticipant(Long expenseId, Long participantId, Long employeeId) {
+        logger.info("Removing participant with employee ID: {} from expense ID: {} by employee ID: {}", participantId,
+                expenseId, employeeId);
 
         try {
-            ExpenseParticipants participant = expenseParticipantsRepository.findById(participantId)
-                    .orElseThrow(() -> new EntityNotFoundException("Participant not found with ID: " + participantId));
+            ExpenseParticipants participant = expenseParticipantsRepository
+                    .findByExpense_ExpenseIdAndEmployee_EmployeeId(expenseId, participantId)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Participant not found with employee ID: " + participantId + " in expense ID: "
+                                    + expenseId));
+
+            logger.info("Found participant ID: {} for employee ID: {} in expense ID: {}",
+                    participant.getParticipantId(), participant.getEmployee().getEmployeeId(),
+                    participant.getExpense().getExpenseId());
+            logger.info("Current user employee ID (from @CurrentUser): {}", employeeId);
+            logger.info("Expense submitter employee ID: {}", participant.getExpense().getSubmittedBy().getEmployeeId());
 
             if (!participant.getExpense().getSubmittedBy().getEmployeeId().equals(employeeId)) {
+                logger.warn("User {} attempted to remove participant from expense {} submitted by {}",
+                        employeeId, participant.getExpense().getExpenseId(),
+                        participant.getExpense().getSubmittedBy().getEmployeeId());
                 throw new IllegalArgumentException("Only the expense submitter can remove participants");
             }
 
@@ -901,7 +924,8 @@ public class TravelExpenseServiceImpl implements TravelExpenseService {
 
             expenseParticipantsRepository.delete(participant);
 
-            logger.info("Successfully removed participant ID: {} from expense", participantId);
+            logger.info("Successfully removed participant ID: {} (employee ID: {}) from expense",
+                    participant.getParticipantId(), participantId);
 
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             logger.error("Error removing expense participant: {}", e.getMessage());
@@ -1000,5 +1024,21 @@ public class TravelExpenseServiceImpl implements TravelExpenseService {
         }
 
         return dto;
+    }
+
+    @Override
+    public List<ExpenseStatusTypeDto> getExpenseStatusTypes() {
+        return expenseStatusRepository.findAll().stream()
+                .map(et -> new ExpenseStatusTypeDto(et.getStatusId(), et.getStatusName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExpenseTypeDto> getAllExpenseTypes() {
+        return expenseTypeRepository.findAll().stream()
+                .map(et -> new ExpenseTypeDto(
+                        et.getExpenseTypeId(),
+                        et.getTypeName()))
+                .collect(Collectors.toList());
     }
 }

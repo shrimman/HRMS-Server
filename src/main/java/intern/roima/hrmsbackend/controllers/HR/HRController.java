@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import intern.roima.hrmsbackend.dtos.Requests.UpdateEmployeeProfileDto;
 import intern.roima.hrmsbackend.dtos.Responses.EmployeeSummaryDto;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
 import intern.roima.hrmsbackend.services.Employee_Module.EmployeeDirectoryService;
@@ -55,7 +56,7 @@ public class HRController {
     @PostMapping("/profile/{id}")
     @PreAuthorize("hasRole('HR')")
     public ResponseEntity<?> updateEmployeeProfile(@PathVariable("id") Long id,
-            @RequestBody EmployeeSummaryDto updatedProfile) {
+            @RequestBody UpdateEmployeeProfileDto updatedProfile) {
         return ResponseEntity.ok(profileService.updateEmployeeProfile(id, updatedProfile));
     }
 

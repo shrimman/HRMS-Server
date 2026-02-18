@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import intern.roima.hrmsbackend.dtos.Requests.UploadTravelDocumentRequest;
+import intern.roima.hrmsbackend.dtos.Responses.DocumentTypeDto;
 import intern.roima.hrmsbackend.dtos.Responses.TravelDocumentDto;
 import intern.roima.hrmsbackend.entities.Employee_Module.Employees;
 import intern.roima.hrmsbackend.entities.Travel_Module.DocumentType;
@@ -302,6 +303,13 @@ public class TravelDocumentServiceImpl implements TravelDocumentService {
             logger.error("Database error deleting document: {}", e.getMessage());
             throw new RuntimeException("Database error while deleting document", e);
         }
+    }
+
+    @Override
+    public List<DocumentTypeDto> getAllDocumentTypes() {
+        return documentTypeRepository.findAll().stream()
+                .map(dt -> new DocumentTypeDto(dt.getDocumentTypeId(), dt.getTypeName()))
+                .collect(Collectors.toList());
     }
 
     private TravelDocumentDto toTravelDocumentDto(TravelDocuments document) {
