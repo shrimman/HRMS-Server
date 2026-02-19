@@ -27,6 +27,7 @@ import intern.roima.hrmsbackend.dtos.Responses.AchievementLikeDto;
 import intern.roima.hrmsbackend.dtos.Responses.AchievementPostDto;
 import intern.roima.hrmsbackend.security.annotations.CurrentUser;
 import intern.roima.hrmsbackend.services.Achievement_Module.AchievementFeedService;
+import intern.roima.hrmsbackend.services.Achievement_Module.SystemPostService;
 import jakarta.validation.Valid;
 
 @RestController
@@ -34,9 +35,11 @@ import jakarta.validation.Valid;
 public class AchievementController {
 
     private final AchievementFeedService achievementFeedService;
+    private final SystemPostService systemPostService;
 
-    public AchievementController(AchievementFeedService achievementFeedService) {
+    public AchievementController(AchievementFeedService achievementFeedService, SystemPostService systemPostService) {
         this.achievementFeedService = achievementFeedService;
+        this.systemPostService = systemPostService;
     }
 
     @GetMapping("/feed")
@@ -161,7 +164,7 @@ public class AchievementController {
     @DeleteMapping("/comments/{commentId}")
     @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
     public ResponseEntity<Void> deleteComment(
-            @PathVariable Long commentId,
+            @PathVariable("commentId") Long commentId,
             @CurrentUser Long employeeId) {
         achievementFeedService.deleteComment(commentId, employeeId);
         return ResponseEntity.noContent().build();
@@ -214,4 +217,15 @@ public class AchievementController {
         return ResponseEntity.ok(achievementFeedService.filterPostsByDateRange(startDate, endDate, currentEmployeeId));
     }
 
+    @GetMapping("/birthdays")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
+    public ResponseEntity<List<String>> getBirthdayPosts() {
+        return ResponseEntity.ok(systemPostService.getBirthdays());
+    }
+
+    @GetMapping("/work-anniversaries")
+    @PreAuthorize("hasAnyRole('HR', 'MANAGER', 'EMPLOYEE')")
+    public ResponseEntity<List<String>> getAnniversaries() {
+        return ResponseEntity.ok(systemPostService.getWorkAnniversaries());
+    }
 }

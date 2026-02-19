@@ -2,6 +2,7 @@ package intern.roima.hrmsbackend.services.Achievement_Module.impl;
 
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -149,6 +150,36 @@ public class SystemPostServiceimpl implements SystemPostService {
             dto.setManagerName(employee.getManager().getFirstName() + " " + employee.getManager().getLastName());
         }
         return dto;
+    }
+
+    @Override
+    public List<String> getBirthdays() {
+        logger.info("Retrieving list of employee birthdays");
+        try {
+            List<String> birthdays = employeeRepository.findEmployeesWithBirthdayToday().stream()
+                    .map(e -> String.format("%s %s", e.getFirstName(), e.getLastName()))
+                    .toList();
+            logger.info("Successfully retrieved {} birthdays", birthdays.size());
+            return birthdays;
+        } catch (DataAccessException e) {
+            logger.error("Database error retrieving birthdays: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public List<String> getWorkAnniversaries() {
+        logger.info("Retrieving list of employee Work Anniversaries");
+        try {
+            List<String> anniversaries = employeeRepository.findEmployeesWithWorkAnniversaryToday().stream()
+                    .map(e -> String.format("%s %s", e.getFirstName(), e.getLastName()))
+                    .toList();
+            logger.info("Successfully retrieved {} birthdays", anniversaries.size());
+            return anniversaries;
+        } catch (DataAccessException e) {
+            logger.error("Database error retrieving birthdays: {}", e.getMessage());
+            throw e;
+        }
     }
 
 }
