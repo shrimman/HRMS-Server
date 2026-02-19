@@ -60,4 +60,11 @@ public interface EmployeeRepository extends JpaRepository<Employees, Long> {
     List<Employees> findByIsActive(boolean isActive);
 
     long countByIsActive(boolean isActive);
+
+    @Query("SELECT e FROM Employees e WHERE FUNCTION('MONTH', e.dateOfBirth) = FUNCTION('MONTH', CURRENT_DATE) AND FUNCTION('DAY', e.dateOfBirth) = FUNCTION('DAY', CURRENT_DATE)")
+    List<Employees> findEmployeesWithBirthdayToday();
+
+    @Query("SELECT e FROM Employees e WHERE FUNCTION('MONTH', e.dateOfJoining) = FUNCTION('MONTH', CURRENT_DATE) AND FUNCTION('DAY', e.dateOfJoining) = FUNCTION('DAY', CURRENT_DATE)")
+    List<Employees> findEmployeesWithWorkAnniversaryToday();
+
 }
