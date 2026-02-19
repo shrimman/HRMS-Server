@@ -41,7 +41,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/orgchart/{id}")
-    @PreAuthorize("hasAnyRole('HR', 'MANAGER') or #id == authentication.principal.employeeId")
+    @PreAuthorize("hasAnyRole('EMPLOYEE','HR', 'MANAGER') or #id == authentication.principal.employeeId")
     public ResponseEntity<OrgChartResponseDto> getOrgChart(@PathVariable("id") Long id) {
         return ResponseEntity.ok(employeeService.getOrgChart(id));
     }
