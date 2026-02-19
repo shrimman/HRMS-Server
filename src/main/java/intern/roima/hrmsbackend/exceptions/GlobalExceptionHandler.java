@@ -113,6 +113,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "FILE_STORAGE_ERROR", ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailSending(EmailSendingException ex,
+            HttpServletRequest request) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SENDING_ERROR", ex.getMessage(), request, null);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnhandled(Exception ex, HttpServletRequest request) {
